@@ -1,5 +1,5 @@
 import tensorflow as tf
-from .type_hint import ShapeTuple
+from .dataset import ShapeTuple
 
 
 def _build_my_cnn(input_shape: ShapeTuple):

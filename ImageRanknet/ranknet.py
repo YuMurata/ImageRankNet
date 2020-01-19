@@ -1,17 +1,31 @@
+from .dataset import ShapeTuple
 import tensorflow as tf
 from pathlib import Path
 import numpy as np
 from .grad_cam import GradCam
 from .evaluate_network import build_evaluate_network
-from .predict_model import PredictModel, ImageList, ShapeTuple
+import typing
+from PIL.Image import Image
+
+ImageList = typing.List[Image]
 
 
-class RankNet(PredictModel):
+class RankNet:
     SCOPE = 'predict_model'
     TRAINABLE_MODEL_FILE_NAME = 'trainable_model.h5'
 
+    class ImageInfo:
+        def __init__(self, image_shape: ShapeTuple):
+            self.shape = image_shape
+            self.width, self.height, self.channel = image_shape
+            self.size = (self.width, self.height)
+
+    def _image_to_array(self, image: Image) -> np.array:
+        resized_image = image.resize(self.image_info.size)
+        return np.asarray(resized_image).astype(np.float32)/255
+
     def __init__(self, image_shape: ShapeTuple, *, use_vgg16: bool = False):
-        super().__init__(image_shape)
+        self.image_info = RankNet.ImageInfo(image_shape)
 
         with tf.name_scope(RankNet.SCOPE):
             evaluate_network = build_evaluate_network(
@@ -40,25 +54,13 @@ class RankNet(PredictModel):
                     from_logits=True)
             self.trainable_model.compile(optimizer='adam', loss=loss)
 
-    def train(self, dataset: tf.data.Dataset, *,
-              log_dir_path: str,
-              valid_dataset: tf.data.Dataset, epochs: int = 10,
+    def train(self, dataset: tf.data.Dataset, valid_dataset: tf.data.Dataset, *,
+              callback_list: typing.List[typing.Callable] = [], epochs: int = 10,
               steps_per_epoch: int = 30):
-        callbacks = tf.keras.callbacks
-
-        cb = []
-
-        cb.append(tf.keras.callbacks.ModelCheckpoint(
-            log_dir_path+'/weights.{epoch:02d}-{loss:.2f}-{val_loss:.2f}.h5',
-            save_weights_only=True, monitor='val_loss', save_best_only=True))
-
-        if log_dir_path is not None:
-            cb.append(callbacks.TensorBoard(log_dir=log_dir_path,
-                                            write_graph=True))
 
         self.trainable_model.fit(dataset, epochs=epochs,
                                  steps_per_epoch=steps_per_epoch,
-                                 callbacks=cb, validation_data=valid_dataset,
+                                 callbacks=callback_list, validation_data=valid_dataset,
                                  validation_steps=10)
 
     def save(self, save_dir_path: str):

@@ -1,7 +1,9 @@
 import tensorflow as tf
 import numpy as np
 import cv2
-from .type_hint import SizeTuple
+import typing
+
+SizeTuple = typing.Tuple[int, int]
 
 
 class GradCam:
