@@ -24,6 +24,7 @@ def make_dataset(dataset_file_path: str,
     with tf.name_scope(f'{name}_{SCOPE}'):
         dataset = \
             tf.data.TFRecordDataset(str(dataset_file_path)) \
+            .map(mapper.map_example) \
             .shuffle(batch_size) \
             .batch(batch_size) \
             .repeat()
