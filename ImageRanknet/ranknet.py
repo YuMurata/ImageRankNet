@@ -6,6 +6,7 @@ from .grad_cam import GradCam
 from .evaluate_network import build_evaluate_network
 import typing
 from PIL.Image import Image
+from .structure import Structure
 
 ImageList = typing.List[Image]
 
@@ -54,6 +55,9 @@ class RankNet:
                     from_logits=True)
             self.trainable_model.compile(optimizer='adam', loss=loss)
 
+            self.structure = Structure(
+                self.predictable_model, self.trainable_model, evaluate_network)
+
     def train(self, dataset: tf.data.Dataset, valid_dataset: tf.data.Dataset, *,
               callback_list: typing.List[typing.Callable] = [], epochs: int = 10,
               steps_per_epoch: int = 30):
@@ -73,18 +77,6 @@ class RankNet:
 
     def load(self, load_file_path: str):
         self.trainable_model.load_weights(load_file_path)
-
-    def save_model_structure(self, save_dir_path: str):
-        save_dir_path = Path(save_dir_path)
-        save_dir_path.mkdir(parents=True, exist_ok=True)
-
-        tf.keras.utils.plot_model(self.predictable_model,
-                                  str(save_dir_path/'predictable_model.png'),
-                                  show_shapes=True)
-
-        tf.keras.utils.plot_model(self.trainable_model,
-                                  str(save_dir_path/'trainable_model.png'),
-                                  show_shapes=True)
 
     def predict(self, data_list: ImageList) -> np.array:
         image_array_list = np.array([self._image_to_array(data)
