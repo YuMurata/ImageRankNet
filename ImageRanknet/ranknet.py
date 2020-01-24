@@ -58,13 +58,16 @@ class RankNet:
             self.structure = Structure(
                 self.predictable_model, self.trainable_model, evaluate_network)
 
-    def train(self, dataset: tf.data.Dataset, valid_dataset: tf.data.Dataset, *,
-              callback_list: typing.List[typing.Callable] = [], epochs: int = 10,
+    def train(self, dataset: tf.data.Dataset, valid_dataset: tf.data.Dataset,
+              *,
+              callback_list: typing.List[typing.Callable] = [],
+              epochs: int = 10,
               steps_per_epoch: int = 30):
 
         self.trainable_model.fit(dataset, epochs=epochs,
                                  steps_per_epoch=steps_per_epoch,
-                                 callbacks=callback_list, validation_data=valid_dataset,
+                                 callbacks=callback_list,
+                                 validation_data=valid_dataset,
                                  validation_steps=10)
 
     def save(self, save_dir_path: str):
