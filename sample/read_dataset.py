@@ -10,7 +10,7 @@ from ImageRankNet import dataset
 
 if __name__ == "__main__":
     mapper = SampleMapper()
-    
+
     train_dataset = dataset.make_dataset(
         str(tfrecords_dir/'train.tfrecord'), mapper, 1, 'train')
 

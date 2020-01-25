@@ -1,5 +1,23 @@
 import tensorflow as tf
 from .dataset import ShapeTuple
+from abc import ABCMeta, abstractmethod
+
+
+class EvaluateBody:
+    '''
+    implement
+    ---
+    def build(self) -> tf.keras.Model
+
+    build your cnn
+    '''
+
+    def __init__(self, image_shape: tuple):
+        self.image_shape = image_shape
+
+    @abstractmethod
+    def build(self) -> tf.keras.Model:
+        pass
 
 
 def _build_my_cnn(input_shape: ShapeTuple):
@@ -29,10 +47,8 @@ def _build_vgg16(input_shape: ShapeTuple):
     return vgg16
 
 
-def build_evaluate_network(input_shape: ShapeTuple,
-                           *, use_vgg16: bool = True) -> tf.keras.Model:
-    convolution_layer = _build_vgg16(
-        input_shape) if use_vgg16 else _build_my_cnn(input_shape)
+def build_evaluate_network(evaluate_body: EvaluateBody) -> tf.keras.Model:
+    convolution_layer = evaluate_body.build()
 
     top_layer = tf.keras.Sequential()
     top_layer.add(tf.keras.layers.Flatten(

@@ -38,11 +38,11 @@ class SampleMapper(dataset.Mapper):
             return x
 
         image1 = \
-            tf.reshape(float_image1_raw, image_shape, name='image1')
+            tf.reshape(float_image1_raw, IMAGE_SHAPE, name='image1')
         image1 = _augmentation(image1)
 
         image2 = \
-            tf.reshape(float_image2_raw, image_shape, name='image2')
+            tf.reshape(float_image2_raw, IMAGE_SHAPE, name='image2')
         image2 = _augmentation(image2)
 
         return ((image1, image2), label)

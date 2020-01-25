@@ -3,7 +3,7 @@ import tensorflow as tf
 from pathlib import Path
 import numpy as np
 from .grad_cam import GradCam
-from .evaluate_network import build_evaluate_network
+from .evaluate_network import build_evaluate_network, EvaluateBody
 import typing
 from PIL.Image import Image
 from .structure import Structure
@@ -25,12 +25,12 @@ class RankNet:
         resized_image = image.resize(self.image_info.size)
         return np.asarray(resized_image).astype(np.float32)/255
 
-    def __init__(self, image_shape: ShapeTuple, *, use_vgg16: bool = False):
+    def __init__(self, evaluate_body: EvaluateBody):
+        image_shape = evaluate_body.image_shape
         self.image_info = RankNet.ImageInfo(image_shape)
 
         with tf.name_scope(RankNet.SCOPE):
-            evaluate_network = build_evaluate_network(
-                image_shape, use_vgg16=use_vgg16)
+            evaluate_network = build_evaluate_network(evaluate_body)
             self.grad_cam = GradCam(evaluate_network, self.image_info.size)
 
             left_input = tf.keras.Input(shape=image_shape)
