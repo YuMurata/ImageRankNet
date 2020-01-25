@@ -12,6 +12,13 @@ class GradCam:
         self.input_image_size = input_image_size
 
     def get_cam(self, image_array: np.array, layer_name: str) -> np.array:
+        '''
+        image_array is RGB
+
+        retrurn
+        ---
+        np.array RGB
+        '''
         grad_model = \
             tf.keras.Model(inputs=[self.model.inputs],
                            outputs=[self.model.get_layer(layer_name).output,
