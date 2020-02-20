@@ -3,7 +3,7 @@ from .dataset import ShapeTuple
 from abc import ABCMeta, abstractmethod
 
 
-class EvaluateBody:
+class EvaluateBody(metaclass=ABCMeta):
     '''
     implement
     ---

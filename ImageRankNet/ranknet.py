@@ -23,7 +23,7 @@ class RankNet:
 
     def _image_to_array(self, image: Image) -> np.array:
         resized_image = image.resize(self.image_info.size)
-        return np.asarray(resized_image).astype(np.float32)/255
+        return np.asarray(resized_image).astype(np.float32) / 255
 
     def __init__(self, evaluate_body: EvaluateBody):
         image_shape = evaluate_body.image_shape
